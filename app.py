@@ -20,7 +20,7 @@ def create_app():
     db.init_app(app)
     ma.init_app(app)
     from resources.users import Users, UserById
-    from resources.bank_account import BankAccountById
+    from resources.bank_account import BankAccountById, BankAccount
 
     CORS(app)
     api = Api(app)
@@ -28,6 +28,7 @@ def create_app():
     api.add_resource(Users, '/users')
     api.add_resource(UserById, '/users/<id>')
     api.add_resource(BankAccountById, '/bank_account/<id>')
+    api.add_resource(BankAccount, '/bank_account')
 
     with app.app_context():
         db.drop_all()
@@ -38,8 +39,8 @@ def create_app():
         db.session.add(user)
         db.session.commit()
 
-        cc = BankAccountModel(name='corrente', value=Decimal(1000))
-        cp = BankAccountModel(name='poupança', value=Decimal(1))
+        cc = BankAccountModel(name='corrente', value=Decimal(1000), user=user)
+        cp = BankAccountModel(name='poupança', value=Decimal(1), user=user)
         db.session.add(cc)
         db.session.add(cp)
         db.session.commit()
