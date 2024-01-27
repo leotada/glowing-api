@@ -1,9 +1,11 @@
+from decimal import Decimal
+
 from flask import Flask
 from flask_cors import CORS
-from flask_marshmallow import Marshmallow
 from flask_restful import Api
 
 from database import db
+
 
 
 def create_app():
@@ -12,24 +14,34 @@ def create_app():
     app.config['SQLALCHEMY_ECHO'] = True
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
-    with app.app_context():
-        from models.user import User
-        db.init_app(app)
-        from resources.users import Users, UserById
+    from models.usermodel import UserModel
+    from models.bank_account import BankAccountModel
+    from schema.base import ma
+    db.init_app(app)
+    ma.init_app(app)
+    from resources.users import Users, UserById
+    from resources.bank_account import BankAccountById
 
     CORS(app)
     api = Api(app)
 
     api.add_resource(Users, '/users')
     api.add_resource(UserById, '/users/<id>')
+    api.add_resource(BankAccountById, '/bank_account/<id>')
 
     with app.app_context():
         db.drop_all()
         db.create_all()
 
         # Dados iniciais
-        user = User(name='s', email='leo@leo.com')
+        user = UserModel(name='Leonardo')
         db.session.add(user)
+        db.session.commit()
+
+        cc = BankAccountModel(name='corrente', value=Decimal(1000))
+        cp = BankAccountModel(name='poupança', value=Decimal(1))
+        db.session.add(cc)
+        db.session.add(cp)
         db.session.commit()
 
     return app
