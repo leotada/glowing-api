@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from flask import make_response, jsonify, request
 from flask_restful import Resource
 
@@ -17,7 +19,7 @@ class BankAccount(Resource):
     def put(self):
         bank_account_from = BankAccountModel.query.filter_by(id=request.json['from']).first()
         bank_account_to = BankAccountModel.query.filter_by(id=request.json['to']).first()
-        value = request.json['value']
+        value = Decimal(request.json['value'])
         # start transaction
         bank_account_from.withdraw(value)
         bank_account_to.deposit(value)
